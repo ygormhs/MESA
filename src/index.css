@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Cores Base */
+    --background: #FFFFFF;
+    /* Fundo principal - branco puro */
+    --foreground: #1A1A1A;
+    /* Texto principal - quase preto */
+
+    /* Verde Mesa - Cor Principal */
+    --primary: #4CAF50;
+    /* Verde principal */
+    --primary-hover: #43A047;
+    /* Verde hover (mais escuro) */
+    --primary-light: #E8F5E9;
+    /* Verde claro para backgrounds */
+    --primary-foreground: #FFFFFF;
+    /* Texto sobre verde */
+
+    /* Cores Secundárias */
+    --secondary: #F5F5F5;
+    /* Cinza claro para cards/backgrounds */
+    --secondary-hover: #EEEEEE;
+    /* Hover em elementos secundários */
+    --secondary-foreground: #1A1A1A;
+    /* Texto sobre secundário */
+
+    /* Cores de Suporte */
+    --muted: #F5F5F5;
+    /* Elementos sutis, backgrounds */
+    --muted-foreground: #757575;
+    /* Texto secundário, labels */
+    --accent: #FFF0E9;
+    /* Laranja claro para destaques */
+    --accent-foreground: #F66E2C;
+    /* Laranja Mesa para badges de desconto */
+
+    /* Bordas e Divisores */
+    --border: #E0E0E0;
+    /* Bordas sutis */
+    --border-light: #F0F0F0;
+    /* Bordas muito sutis */
+    --ring: #4CAF50;
+    /* Focus rings - verde */
+
+    /* Laranja Mesa - Cor de Destaque/Desconto */
+    --orange: #F66E2C;
+    /* Laranja principal */
+    --orange-light: #FFF0E9;
+    /* Fundo de badges de desconto */
+
+    /* Functional Colors */
+    --mesa-green: #4CAF50;
+    /* Same as primary */
+    --mesa-orange: #F66E2C;
+    /* Same as orange */
+
+    /* Fonts */
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    /* Radius */
+    --radius: 1rem;
+    /* 16px default */
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased font-sans;
+  }
+}
+
+/* Custom Scrollbar for hidden utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
