@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { BackgroundGradientAnimation } from '../components/ui/BackgroundGradientAnimation';
 
 export default function Login() {
@@ -18,8 +19,29 @@ export default function Login() {
         setIsLoading(true);
 
         try {
-            await login({ email, password });
-            navigate('/');
+            const { user } = await login({ email, password });
+
+            // Check role to redirect correctly
+            // We can check the metadata first as it's faster and usually sufficient
+            // But for safety, let's fetch the profile if needed, or rely on AuthContext if it updated fast enough.
+            // Since AuthContext updates asynchronously, we'll manually fetch the role here for immediate redirect.
+
+            // Try enabling metadata first
+            // const role = user.user_metadata?.role; 
+
+            // Or better, since we have the session:
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+
+            if (profile?.role === 'restaurant') {
+                navigate('/restaurant');
+            } else {
+                navigate('/');
+            }
+
         } catch (error) {
             console.error(error);
             alert('Erro ao fazer login. Verifique suas credenciais.');
