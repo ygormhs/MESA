@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import {
     LayoutDashboard,
     Store,
@@ -28,12 +29,12 @@ export function RestaurantLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isRestaurantOpen, setIsRestaurantOpen] = useState(true);
     const navigate = useNavigate();
+    const { logout } = useAuth();
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-    const handleLogout = () => {
-        // Implement logout logic here
-        navigate('/login');
+    const handleLogout = async () => {
+        await logout();
     };
 
     return (

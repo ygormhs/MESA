@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { LogOut, User as UserIcon, Mail, Shield } from 'lucide-react';
 
 export default function Profile() {
-    const { user, userRole, signOut } = useAuth();
+    const { user, userRole, logout } = useAuth();
 
     return (
         <Layout>
@@ -43,7 +43,7 @@ export default function Profile() {
                 </div>
 
                 <button
-                    onClick={signOut}
+                    onClick={logout}
                     className="w-full flex items-center justify-center gap-2 p-4 text-red-600 font-bold bg-red-50 hover:bg-red-100 rounded-xl transition-colors"
                 >
                     <LogOut className="w-5 h-5" />
