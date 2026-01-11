@@ -13,6 +13,7 @@ import Orders from './pages/Orders';
 // Auth Pages
 import Login from './pages/Login';
 import Register from './pages/Register';
+import NotFound from './pages/NotFound';
 
 // Restaurant Pages
 import { RestaurantLayout } from './layouts/RestaurantLayout';
@@ -98,8 +99,6 @@ function App() {
               {/* Placeholders for future routes */}
               <Route path="*" element={<div className="p-8 text-center text-gray-500">Página em construção 🚧</div>} />
             </Route>
-
-            import NotFound from './pages/NotFound';
 
             {/* Catch all - 404 */}
             <Route path="*" element={<NotFound />} />

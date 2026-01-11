@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
 
 const AuthContext = createContext({});
 
@@ -8,9 +9,17 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [configError, setConfigError] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
+        if (!supabase) {
+            console.error("AuthContext: Supabase client is missing.");
+            setConfigError(true);
+            setLoading(false);
+            return;
+        }
+
         // Initial Session Check
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
@@ -39,6 +48,7 @@ export function AuthProvider({ children }) {
     }, []);
 
     const fetchProfile = async (authUser) => {
+        if (!supabase) return;
         try {
             const { data, error } = await supabase
                 .from('profiles')
@@ -50,10 +60,9 @@ export function AuthProvider({ children }) {
                 console.warn('Error fetching profile:', error);
             }
 
-            // Combine auth user with profile data
             const fullUser = {
                 ...authUser,
-                ...data, // Setup.sql columns: role, full_name, etc.
+                ...data,
             };
 
             setUser(fullUser);
@@ -65,6 +74,7 @@ export function AuthProvider({ children }) {
     };
 
     const login = async ({ email, password }) => {
+        if (!supabase) throw new Error("Supabase não configurado.");
         const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
@@ -74,13 +84,14 @@ export function AuthProvider({ children }) {
     };
 
     const register = async ({ email, password, name, role = 'client' }) => {
+        if (!supabase) throw new Error("Supabase não configurado.");
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
                 data: {
                     full_name: name,
-                    role: role, // Trigger handles inserting this into profiles
+                    role: role,
                 },
             },
         });
@@ -89,17 +100,33 @@ export function AuthProvider({ children }) {
     };
 
     const logout = async () => {
+        if (!supabase) return;
         await supabase.auth.signOut();
         setUser(null);
         setSession(null);
         navigate('/login');
     };
 
+    if (configError) {
+        return (
+            <div className="min-h-screen flex items-center justify-center p-6 bg-red-50 text-red-800 text-center">
+                <div className="max-w-md space-y-4">
+                    <AlertTriangle className="w-12 h-12 mx-auto" />
+                    <h2 className="text-xl font-bold">Erro de Configuração</h2>
+                    <p>O aplicativo não conseguiu conectar ao banco de dados.</p>
+                    <p className="text-sm bg-white p-3 rounded border border-red-200 font-mono">
+                        Missing environment variables: VITE_SUPABASE_URL
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     const value = {
         user,
         session,
         loading,
-        userRole: user?.role, // Expose role directly
+        userRole: user?.role,
         login,
         register,
         logout,
