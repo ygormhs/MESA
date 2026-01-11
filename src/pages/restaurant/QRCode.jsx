@@ -32,7 +32,7 @@ export default function QRCode() {
     if (loading) return <div>Carregando...</div>;
     if (!restaurant) return <div>Restaurante não encontrado.</div>;
 
-    const qrData = `https://mesa.app/validation/${restaurant.id}`;
+    const qrData = `${window.location.origin}/validation/${restaurant.id}`;
 
     return (
         <div className="space-y-6">

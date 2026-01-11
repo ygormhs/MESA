@@ -55,9 +55,12 @@ export default function Scanner() {
         if (data && !scannedData) {
             // Check if it matches our expected URL format
             // Expected: https://mesa.app/validation/:id or just mesa.app/validation/:id
-            if (data.includes('mesa.app/validation/')) {
+            // Flexible check: Look for "validation/" segment regardless of domain
+            if (data.includes('/validation/')) {
                 setScannedData(data);
-                const parts = data.split('validation/');
+
+                // robust split to handle different url structures
+                const parts = data.split('/validation/');
                 const restaurantId = parts[1];
 
                 if (restaurantId) {
