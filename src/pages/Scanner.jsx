@@ -1,21 +1,74 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Webcam from 'react-webcam';
+import jsQR from 'jsqr';
 import { X, Zap, QrCode } from 'lucide-react';
 import { BottomNav } from '../components/BottomNav';
 
 export default function Scanner() {
     const navigate = useNavigate();
-    const camera = useRef(null);
+    const webcamRef = useRef(null);
     const [flashlight, setFlashlight] = useState(false);
-
-    const handleMockScan = () => {
-        // Simulate a successful scan of restaurant ID '1'
-        navigate('/validation/1');
-    };
+    const [scannedData, setScannedData] = useState(null);
 
     const videoConstraints = {
         facingMode: "environment"
+    };
+
+    const capture = useCallback(() => {
+        const imageSrc = webcamRef.current?.getScreenshot();
+        if (imageSrc) {
+            // Create an image object to draw onto a canvas
+            const image = new Image();
+            image.src = imageSrc;
+            image.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = image.width;
+                canvas.height = image.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(image, 0, 0);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+
+                if (code) {
+                    console.log("Found QR code", code.data);
+                    handleScan(code.data);
+                }
+            };
+        }
+    }, [webcamRef]);
+
+    // Loop for scanning
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!scannedData) {
+                capture();
+            }
+        }, 500); // Scan every 500ms
+        return () => clearInterval(interval);
+    }, [capture, scannedData]);
+
+    const handleScan = (data) => {
+        if (data && !scannedData) {
+            // Check if it matches our expected URL format
+            // Expected: https://mesa.app/validation/:id or just mesa.app/validation/:id
+            if (data.includes('mesa.app/validation/')) {
+                setScannedData(data);
+                const parts = data.split('validation/');
+                const restaurantId = parts[1];
+
+                if (restaurantId) {
+                    // Small vibrate for feedback
+                    if (navigator.vibrate) navigator.vibrate(200);
+                    navigate(`/validation/${restaurantId}`);
+                }
+            } else {
+                console.log("Ignored QR Code:", data);
+            }
+        }
     };
 
     return (
@@ -38,7 +91,7 @@ export default function Scanner() {
             <div className="flex-1 w-full relative flex items-center justify-center overflow-hidden bg-gray-900">
                 <div className="absolute inset-0 z-0">
                     <Webcam
-                        ref={camera}
+                        ref={webcamRef}
                         audio={false}
                         screenshotFormat="image/jpeg"
                         videoConstraints={videoConstraints}
@@ -62,17 +115,8 @@ export default function Scanner() {
             </div>
 
             {/* Bottom Controls */}
-            <div className="w-full bg-black p-8 pb-32 z-20 rounded-t-3xl -mt-6">
-                <div className="flex justify-center items-center gap-8">
-                    {/* Mock Trigger for Dev/Demo */}
-                    <button
-                        onClick={handleMockScan}
-                        className="w-20 h-20 bg-white rounded-full border-4 border-gray-300 flex items-center justify-center hover:scale-105 transition-transform shadow-[0_0_20px_rgba(255,255,255,0.3)]"
-                    >
-                        <QrCode className="w-8 h-8 text-black" />
-                    </button>
-                    <p className="absolute bottom-12 text-white/30 text-xs">Simular Scan</p>
-                </div>
+            <div className="w-full bg-black p-8 pb-32 z-20 rounded-t-3xl -mt-6 text-center">
+                <p className="text-gray-500 text-sm">O código será lido automaticamente</p>
             </div>
 
             <BottomNav />
