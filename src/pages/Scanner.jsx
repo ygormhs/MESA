@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera } from 'react-camera-pro';
+import Webcam from 'react-webcam';
 import { X, Zap, QrCode } from 'lucide-react';
 import { BottomNav } from '../components/BottomNav';
 
@@ -14,6 +14,10 @@ export default function Scanner() {
         navigate('/validation/1');
     };
 
+    const videoConstraints = {
+        facingMode: "environment"
+    };
+
     return (
         <div className="min-h-screen bg-black flex flex-col items-center justify-between relative overflow-hidden">
             {/* Header Overlay */}
@@ -22,7 +26,10 @@ export default function Scanner() {
                     <X className="w-6 h-6" />
                 </button>
                 <h1 className="text-white font-bold text-lg tracking-wide">Escanear QR Code</h1>
-                <button onClick={() => setFlashlight(!flashlight)} className={`p-2 rounded-full transition-all ${flashlight ? 'bg-yellow-400 text-black' : 'bg-white/20 text-white'}`}>
+                <button
+                    onClick={() => setFlashlight(!flashlight)}
+                    className={`p-2 rounded-full transition-all ${flashlight ? 'bg-yellow-400 text-black' : 'bg-white/20 text-white'}`}
+                >
                     <Zap className="w-6 h-6" fill={flashlight ? "currentColor" : "none"} />
                 </button>
             </div>
@@ -30,16 +37,12 @@ export default function Scanner() {
             {/* Camera Viewfinder Area */}
             <div className="flex-1 w-full relative flex items-center justify-center overflow-hidden bg-gray-900">
                 <div className="absolute inset-0 z-0">
-                    <Camera
+                    <Webcam
                         ref={camera}
-                        aspectRatio={16 / 9}
-                        facingMode="environment"
-                        errorMessages={{
-                            noCameraAccessible: 'Nenhuma câmera encontrada',
-                            permissionDenied: 'Permissão para usar a câmera negada',
-                            switchCamera: 'Não é possível trocar de câmera',
-                            canvas: 'Canvas não suportado'
-                        }}
+                        audio={false}
+                        screenshotFormat="image/jpeg"
+                        videoConstraints={videoConstraints}
+                        className="w-full h-full object-cover"
                     />
                 </div>
 
