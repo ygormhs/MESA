@@ -1,6 +1,39 @@
+import { useState, useEffect } from 'react';
 import { Download, Printer, Share2, Info } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
 
 export default function QRCode() {
+    const { user } = useAuth();
+    const [restaurant, setRestaurant] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        async function fetchRestaurant() {
+            try {
+                const { data, error } = await supabase
+                    .from('restaurants')
+                    .select('*')
+                    .eq('profile_id', user.id)
+                    .single();
+
+                if (error) throw error;
+                setRestaurant(data);
+            } catch (error) {
+                console.error('Error fetching restaurant:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        if (user) fetchRestaurant();
+    }, [user]);
+
+    if (loading) return <div>Carregando...</div>;
+    if (!restaurant) return <div>Restaurante não encontrado.</div>;
+
+    const qrData = `https://mesa.app/validation/${restaurant.id}`;
+
     return (
         <div className="space-y-6">
             {/* Header */}
@@ -15,12 +48,12 @@ export default function QRCode() {
                     <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center text-center">
                         <div className="w-64 h-64 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center mb-6">
                             <img
-                                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://mesa.app/r/trattoria-bella`}
+                                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${qrData}`}
                                 alt="QR Code"
                                 className="w-56 h-56"
                             />
                         </div>
-                        <h2 className="text-xl font-bold text-gray-900 mb-2">Trattoria Bella</h2>
+                        <h2 className="text-xl font-bold text-gray-900 mb-2">{restaurant.name}</h2>
                         <p className="text-gray-500 max-w-md mb-6">
                             Este é o seu QR Code exclusivo. Imprima-o e coloque-o nas mesas ou no balcão para que seus clientes acumulem pontos.
                         </p>
