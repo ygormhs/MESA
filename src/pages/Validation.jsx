@@ -215,7 +215,7 @@ export default function Validation() {
                 <button
                     onClick={handleValidation}
                     disabled={!isFormValid || isSaving}
-                    className="w-full bg-gray-900 text-white h-14 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl hover:scale-[1.01] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-mesa-green text-white h-14 rounded-xl font-bold text-lg shadow-lg shadow-green-200 hover:shadow-xl hover:bg-green-600 hover:scale-[1.01] transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                     {isSaving ? (
                         <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
