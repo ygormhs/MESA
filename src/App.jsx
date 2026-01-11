@@ -99,7 +99,10 @@ function App() {
               <Route path="*" element={<div className="p-8 text-center text-gray-500">Página em construção 🚧</div>} />
             </Route>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            import NotFound from './pages/NotFound';
+
+            {/* Catch all - 404 */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </AuthProvider>
